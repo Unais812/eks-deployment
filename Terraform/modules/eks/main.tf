@@ -2,14 +2,14 @@ resource "aws_eks_cluster" "eks-cluster" {
   name = "eks-cluster"
 
   access_config {
-    authentication_mode = "API"
+    authentication_mode = "API_AND_CONFIG_MAP"
+    bootstrap_cluster_creator_admin_permissions = true
 }
 
   role_arn = aws_iam_role.eks-cluster-role.arn
   version  = var.version-k8s
   
   vpc_config {
-    # vpc_id = var.vpc-id
     subnet_ids = [
       var.private-subnet-1,
       var.private-subnet-2
@@ -29,11 +29,11 @@ resource "aws_eks_cluster" "eks-cluster" {
   ]
 }
 
-# resource "aws_eks_access_entry" "example" {
-#   cluster_name      = aws_eks_cluster.eks-cluster.name
-#   principal_arn     = var.principal-arn
-#   type              = "STANDARD"
-# }
+resource "aws_eks_access_entry" "example" {
+  cluster_name      = aws_eks_cluster.eks-cluster.name
+  principal_arn     = var.principal-arn
+  type              = "STANDARD"
+}
 
 
 resource "aws_iam_role" "eks-cluster-role" {
