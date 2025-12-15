@@ -29,11 +29,6 @@ resource "aws_eks_cluster" "eks-cluster" {
   ]
 }
 
-resource "aws_eks_access_entry" "example" {
-  cluster_name      = aws_eks_cluster.eks-cluster.name
-  principal_arn     = var.principal-arn
-  type              = "STANDARD"
-}
 
 
 resource "aws_iam_role" "eks-cluster-role" {
