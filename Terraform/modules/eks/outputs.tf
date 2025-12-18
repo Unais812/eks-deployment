@@ -17,3 +17,11 @@ output "node-role-arn" {
 output "eks-node-role-arn" {
   value = aws_iam_role.eks-node-role.arn
 }
+
+output "pod-role-name" {
+  value = aws_iam_role.pod-role.name
+}
+
+output "pod-role-arn" {
+  value = aws_iam_role.pod-role.arn
+}

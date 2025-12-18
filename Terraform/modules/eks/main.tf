@@ -1,6 +1,5 @@
 resource "aws_eks_cluster" "eks-cluster" {
   name = "eks-cluster"
-
   access_config {
     authentication_mode = "API_AND_CONFIG_MAP"
     bootstrap_cluster_creator_admin_permissions = true
@@ -14,7 +13,6 @@ resource "aws_eks_cluster" "eks-cluster" {
       var.private-subnet-1,
       var.private-subnet-2
     ]
-    
   }
 
   # Ensure that IAM Role permissions are created before and deleted
@@ -160,4 +158,37 @@ resource "aws_iam_role_policy_attachment" "node-policy-EKS_CNI" {
 resource "aws_iam_role_policy_attachment" "node-policy-ec2_registry" {
   policy_arn = var.node-policy3-arn
   role       = aws_iam_role.eks-node-role.name
+}
+
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["pods.eks.amazonaws.com"]
+    }
+
+    actions = [
+      "sts:AssumeRole",
+      "sts:TagSession"
+    ]
+  }
+}
+
+resource "aws_iam_role" "pod-role" {
+  name               = "eks-pod-identity-example"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "ecr-pull" {
+  policy_arn = var.pod-iam-arn
+  role       = aws_iam_role.pod-role.name
+}
+
+resource "aws_eks_pod_identity_association" "example" {
+  cluster_name    = aws_eks_cluster.eks-cluster.name
+  namespace       = "default"
+  service_account = "pod-sa"
+  role_arn        = aws_iam_role.pod-role.arn
 }

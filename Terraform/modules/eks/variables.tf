@@ -104,3 +104,9 @@ variable "principal-arn" {
   type = string
   default = "arn:aws:iam::801822495646:user/unais812"
 }
+
+variable "pod-iam-arn" {
+  description = "policy of the pod to pull ecr images"
+  type = string
+  default = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
+}
