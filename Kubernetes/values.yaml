@@ -1,0 +1,10 @@
+image:
+  url: "801822495646.dkr.ecr.eu-north-1.amazonaws.com/eks-project:latest"
+  name: "MyApp"
+  container-port: "5500"
+  container-name: "latest"
+
+labels:
+  pod-label: application
+
+ 

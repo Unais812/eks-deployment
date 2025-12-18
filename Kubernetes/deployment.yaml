@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment-eks # Deployments identifier in the namespace 
+  labels:
+    app: application # label for k8s 
+spec:
+  replicas: 2
+  selector:  # defines which pods belong to this deployment 
+    matchLabels:
+      app: application   # label of the pods this deployment will manage 
+  template:   # This is the label applied to Pods created by this Deployment.
+    metadata:
+      labels:   
+        app: application
+    spec:
+      containers:
+      - name: app
+        image: 801822495646.dkr.ecr.eu-north-1.amazonaws.com/eks-project:latest
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5500
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe: 
+          httpGet: 
+            path: /
+            port: 5500
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+        ports:
+        - containerPort: 5500
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-eks
+  labels:
+    app: application
+spec:
+  selector:
+    app: application
+  ports:
+    - protocol: TCP
+      port: 5500
+      targetPort: 5500
+  type: ClusterIP
+
+---
+
+

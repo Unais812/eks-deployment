@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-eks
+#  annotations:
+#    nginx.ingress.kubernetes.io/ssl-redirect: "true" # Forces HTTPS when TLS is configured; prevents plaintext access
+spec:
+  ingressClassName: nginx
+#  tls: 
+#  - hosts: mydomain 
+  rules:
+#  - host: 
+#     - mydomain
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix  # Prefix allows routing of / and any subpaths
+        backend:
+          service:
+            name: svc-eks
+            port:
+              number: 80
+            
+---
+
+
+
+
+
