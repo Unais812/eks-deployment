@@ -16,3 +16,10 @@ terraform {
 provider "aws" {
   region = "eu-north-1"
 }
+
+provider "helm" {
+  kubernetes = {
+    host        = module.eks.eks-cluster-endpoint
+    config_path = "~/.kube/config"
+  }
+}
