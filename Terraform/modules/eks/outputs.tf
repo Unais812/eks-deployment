@@ -25,3 +25,7 @@ output "pod-role-name" {
 output "pod-role-arn" {
   value = aws_iam_role.pod-role.arn
 }
+
+output "eks-cluster-endpoint" {
+  value = aws_eks_cluster.eks-cluster.endpoint
+}
