@@ -29,3 +29,7 @@ output "pod-role-arn" {
 output "eks-cluster-endpoint" {
   value = aws_eks_cluster.eks-cluster.endpoint
 }
+
+output "eks-node-group-id" {
+  value = aws_eks_node_group.eks-node-group.id
+}
