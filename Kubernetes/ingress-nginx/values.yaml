@@ -231,7 +231,8 @@ controller:
 
   # -- Labels to be added to the controller Deployment or DaemonSet and other resources that do not have option to specify labels
   ##
-  labels: {}
+  labels: 
+    label: application
   #  keel.sh/policy: patch
   #  keel.sh/trigger: poll
 
@@ -349,28 +350,28 @@ controller:
   ##   timeoutSeconds: 2
   ##   successThreshold: 1
   ##   failureThreshold: 5
-  livenessProbe:
-    httpGet:
-      # should match container.healthCheckPath
-      path: "/healthz"
-      port: 10254
-      scheme: HTTP
-    initialDelaySeconds: 10
-    periodSeconds: 10
-    timeoutSeconds: 1
-    successThreshold: 1
-    failureThreshold: 5
-  readinessProbe:
-    httpGet:
-      # should match container.healthCheckPath
-      path: "/healthz"
-      port: 10254
-      scheme: HTTP
-    initialDelaySeconds: 10
-    periodSeconds: 10
-    timeoutSeconds: 1
-    successThreshold: 1
-    failureThreshold: 3
+  # livenessProbe:
+  #   httpGet:
+  #     # should match container.healthCheckPath
+  #     path: "/healthz"
+  #     port: 10254
+  #     scheme: HTTP
+  #   initialDelaySeconds: 10
+  #   periodSeconds: 10
+  #   timeoutSeconds: 1
+  #   successThreshold: 1
+  #   failureThreshold: 5
+  # readinessProbe:
+  #   httpGet:
+  #     # should match container.healthCheckPath
+  #     path: "/healthz"
+  #     port: 10254
+  #     scheme: HTTP
+  #   initialDelaySeconds: 10
+  #   periodSeconds: 10
+  #   timeoutSeconds: 1
+  #   successThreshold: 1
+  #   failureThreshold: 3
   # -- Path of the health check endpoint. All requests received on the port defined by
   # the healthz-port parameter are forwarded internally to this path.
   healthCheckPath: "/healthz"
@@ -381,10 +382,10 @@ controller:
   # -- Annotations to be added to controller pods
   ##
   podAnnotations: {}
-  replicaCount: 1
+  # replicaCount: 1
   # -- Minimum available pods set in PodDisruptionBudget.
   # Define either 'minAvailable' or 'maxUnavailable', never both.
-  minAvailable: 1
+  # minAvailable: 1
   # -- Maximum unavailable pods set in PodDisruptionBudget. If set, 'minAvailable' is ignored.
   # maxUnavailable: 1
   # -- Eviction policy for unhealthy pods guarded by PodDisruptionBudget.
@@ -409,14 +410,14 @@ controller:
   # - resourceName: memory
   #   restartPolicy: RestartContainer
   # Mutually exclusive with keda autoscaling
-  autoscaling:
-    enabled: false
-    annotations: {}
-    minReplicas: 1
-    maxReplicas: 11
-    targetCPUUtilizationPercentage: 50
-    targetMemoryUtilizationPercentage: 50
-    behavior: {}
+  # autoscaling:
+  #   enabled: false
+  #   annotations: {}
+  #   minReplicas: 1
+  #   maxReplicas: 11
+  #   targetCPUUtilizationPercentage: 50
+  #   targetMemoryUtilizationPercentage: 50
+  #   behavior: {}
     # scaleDown:
     #   stabilizationWindowSeconds: 300
     #   policies:
