@@ -231,51 +231,103 @@ resource "aws_eks_pod_identity_association" "example" {
 }
 
 
-resource "aws_iam_policy" "external-dns-policy" {
-name        = "test_policy"
-path        = "/"
-description = "external dns iam policy"
+# resource "aws_iam_policy" "external-dns-policy" {
+# name        = "test_policy"
+# path        = "/"
+# description = "external dns iam policy"
 
-# Terraform's "jsonencode" function converts a
-# Terraform expression result to valid JSON syntax.
-policy = jsonencode ({
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "route53:ChangeResourceRecordSets"
-      ],
-      "Resource": [
-        "arn:aws:route53:::hostedzone/*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "route53:ListHostedZones",
-        "route53:ListResourceRecordSets",
-        "route53:ListTagsForResource"
-      ],
-      "Resource": [
-        "*"
-      ]
+# # Terraform's "jsonencode" function converts a
+# # Terraform expression result to valid JSON syntax.
+# policy = jsonencode ({
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Effect": "Allow",
+#       "Action": [
+#         "route53:ChangeResourceRecordSets"
+#       ],
+#       "Resource": [
+#         "arn:aws:route53:::hostedzone/*"
+#       ]
+#     },
+#     {
+#       "Effect": "Allow",
+#       "Action": [
+#         "route53:ListHostedZones",
+#         "route53:ListResourceRecordSets",
+#         "route53:ListTagsForResource"
+#       ],
+#       "Resource": [
+#         "*"
+#       ]
+#     }
+#   ]
+#  })
+# }
+
+
+data "aws_iam_policy_document" "external-dns-assume" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["pods.eks.amazonaws.com"]
     }
-  ]
- })
+
+    actions = [
+      "sts:AssumeRole",
+      "sts:TagSession"
+    ]
+  }
 }
+
+
+data "aws_iam_policy_document" "external-dns-policy-document" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "route53:ChangeResourceRecordSets"
+    ]
+
+    resources = [
+      "arn:aws:route53:::hostedzone/*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "route53:ListHostedZones",
+      "route53:ListResourceRecordSets",
+      "route53:ListTagsForResource"
+    ]
+
+    resources = ["*"]
+  }
+}
+
+
+
 
 resource "aws_iam_role" "external-dns-role" {
   name               = "external-dns-role"
-  assume_role_policy = data.aws_iam_policy.external-dns-policy.json
+  assume_role_policy = data.aws_iam_policy_document.external-dns-assume.json
 }
 
-resource "aws_iam_role_policy_attachment" "CertManager-pod" {
+resource "aws_iam_policy" "external-dns-policy" {
+  name   = "external-dns-route53"
+  policy = data.aws_iam_policy_document.external-dns-policy-document.json
+}
+
+resource "aws_iam_role_policy_attachment" "external-dns-attachment" {
   policy_arn = aws_iam_policy.external-dns-policy.arn
   role       = aws_iam_role.external-dns-role.name
 }
 
-resource "aws_eks_pod_identity_association" "example" {
+resource "aws_eks_pod_identity_association" "external-dns-pod-association" {
   cluster_name    = aws_eks_cluster.eks-cluster.name
   namespace       = "external-dns"
   service_account = "external-dns"
