@@ -160,7 +160,8 @@ resource "aws_iam_role_policy_attachment" "node-policy-ec2_registry" {
   role       = aws_iam_role.eks-node-role.name
 }
 
-data "aws_iam_policy_document" "assume_role" {
+
+data "aws_iam_policy_document" "pod-role-ec2registry" {
   statement {
     effect = "Allow"
 
@@ -176,19 +177,107 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
-resource "aws_iam_role" "pod-role" {
-  name               = "eks-pod-identity-example"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+resource "aws_iam_role" "pod-role-ec2registry" {
+  name               = "pod-role-ec2registry"
+  assume_role_policy = data.aws_iam_policy_document.pod-role-ec2registry.json
 }
 
 resource "aws_iam_role_policy_attachment" "ecr-pull" {
   policy_arn = var.pod-iam-arn
-  role       = aws_iam_role.pod-role.name
+  role       = aws_iam_role.pod-role-ec2registry.name
+}
+
+resource "aws_eks_pod_identity_association" "Ec2RegistryAccess" {
+  cluster_name    = aws_eks_cluster.eks-cluster.name
+  namespace       = "default"
+  service_account = "ec2registry-sa"
+  role_arn        = aws_iam_role.pod-role-ec2registry.arn
+}
+
+
+
+
+data "aws_iam_policy_document" "CertManager-pod" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["pods.eks.amazonaws.com"]
+    }
+
+    actions = [
+      "sts:AssumeRole",
+      "sts:TagSession"
+    ]
+  }
+}
+
+resource "aws_iam_role" "CertManager-pod" {
+  name               = "CertManager-pod"
+  assume_role_policy = data.aws_iam_policy_document.CertManager-pod.json
+}
+
+resource "aws_iam_role_policy_attachment" "CertManager-pod" {
+  policy_arn = "arn:aws:iam::aws:policy/AWSCertificateManagerFullAccess"
+  role       = aws_iam_role.CertManager-pod.name
+}
+
+resource "aws_eks_pod_identity_association" "example" {
+  cluster_name    = aws_eks_cluster.eks-cluster.name
+  namespace       = "cert-manager"   # namespace created by the helm chart
+  service_account = "external-dns-controller"
+  role_arn        = aws_iam_role.CertManager-pod.arn
+}
+
+
+resource "aws_iam_policy" "external-dns-policy" {
+name        = "test_policy"
+path        = "/"
+description = "external dns iam policy"
+
+# Terraform's "jsonencode" function converts a
+# Terraform expression result to valid JSON syntax.
+policy = jsonencode ({
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "route53:ChangeResourceRecordSets"
+      ],
+      "Resource": [
+        "arn:aws:route53:::hostedzone/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "route53:ListHostedZones",
+        "route53:ListResourceRecordSets",
+        "route53:ListTagsForResource"
+      ],
+      "Resource": [
+        "*"
+      ]
+    }
+  ]
+ })
+}
+
+resource "aws_iam_role" "external-dns-role" {
+  name               = "external-dns-role"
+  assume_role_policy = data.aws_iam_policy.external-dns-policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "CertManager-pod" {
+  policy_arn = aws_iam_policy.external-dns-policy.arn
+  role       = aws_iam_role.external-dns-role.name
 }
 
 resource "aws_eks_pod_identity_association" "example" {
   cluster_name    = aws_eks_cluster.eks-cluster.name
   namespace       = "default"
-  service_account = "pod-sa"
-  role_arn        = aws_iam_role.pod-role.arn
+  service_account = "external-dns"
+  role_arn        = aws_iam_role.external-dns-role.arn
 }
