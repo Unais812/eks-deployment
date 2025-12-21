@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-deployment-eks # Deployments identifier in the namespace 
+  name: deployment-eks # Deployments identifier in the namespace 
   labels:
     app: application # label for k8s 
 spec:
@@ -41,7 +41,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: svc-eks
+  name: eks-service
   labels:
     app: application
 spec:
