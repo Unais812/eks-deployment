@@ -1,0 +1,19 @@
+provider: aws
+
+policy: upsert-only
+
+registry: txt
+txtOwnerId: external-dns
+
+sources:
+  - ingress
+
+domainFilters:
+  - tm.nginxunais.com
+
+aws:
+  region: eu-north-1
+
+serviceAccount:
+  create: true
+  name: external-dns
