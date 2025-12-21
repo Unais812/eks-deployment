@@ -9,8 +9,3 @@ module "eks" {
   vpc-id           = module.vpc.vpc_id
 }
 
-module "helm" {
-  source = "./modules/helm"
-  node-group = module.eks.eks-node-group-id
-
-}
