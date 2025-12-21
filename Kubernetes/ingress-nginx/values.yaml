@@ -232,7 +232,7 @@ controller:
   # -- Labels to be added to the controller Deployment or DaemonSet and other resources that do not have option to specify labels
   ##
   labels: 
-    label: application
+    label: {}
   #  keel.sh/policy: patch
   #  keel.sh/trigger: poll
 
