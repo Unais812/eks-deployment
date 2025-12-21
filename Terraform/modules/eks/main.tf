@@ -277,7 +277,7 @@ resource "aws_iam_role_policy_attachment" "CertManager-pod" {
 
 resource "aws_eks_pod_identity_association" "example" {
   cluster_name    = aws_eks_cluster.eks-cluster.name
-  namespace       = "default"
+  namespace       = "external-dns"
   service_account = "external-dns"
   role_arn        = aws_iam_role.external-dns-role.arn
 }
