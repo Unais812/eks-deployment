@@ -5,14 +5,14 @@ metadata:
 spec:
   acme:
     email: unaisrashid13@gmail.com
-    server: https://acme-staging-v02.api.letsencrypt.org/directory   # Staging server
-    # server: https://acme-v02.api.letsencrypt.org/directory   # Production service
+    # server: https://acme-staging-v02.api.letsencrypt.org/directory   # Staging server
+    server: https://acme-v02.api.letsencrypt.org/directory   # Production service
     privateKeySecretRef:        # Where the private key of cert lives
       name: letsencrypt-route53
     solvers:        # Validate owenership of domain when cert is issued 
       - selector:
           dnsZones:
-            - tm.nginxunais.com
+            - nginxunais.com
         dns01:
           route53:
             region: eu-north-1
