@@ -129,7 +129,7 @@ resource "aws_route_table_association" "private_associations-2" {
   route_table_id = aws_route_table.eks-route-table-private.id
 }
 
-resource "aws_vpc_endpoint" "eks" {
-  vpc_id       = aws_vpc.eks-project-vpc.id
-  service_name = "com.amazonaws.eu-north-1.eks"
-}
+# resource "aws_vpc_endpoint" "eks" {
+#   vpc_id       = aws_vpc.eks-project-vpc.id
+#   service_name = "com.amazonaws.eu-north-1.eks"
+# }
