@@ -231,41 +231,6 @@ resource "aws_eks_pod_identity_association" "example" {
 }
 
 
-# resource "aws_iam_policy" "external-dns-policy" {
-# name        = "test_policy"
-# path        = "/"
-# description = "external dns iam policy"
-
-# # Terraform's "jsonencode" function converts a
-# # Terraform expression result to valid JSON syntax.
-# policy = jsonencode ({
-#   "Version": "2012-10-17",
-#   "Statement": [
-#     {
-#       "Effect": "Allow",
-#       "Action": [
-#         "route53:ChangeResourceRecordSets"
-#       ],
-#       "Resource": [
-#         "arn:aws:route53:::hostedzone/*"
-#       ]
-#     },
-#     {
-#       "Effect": "Allow",
-#       "Action": [
-#         "route53:ListHostedZones",
-#         "route53:ListResourceRecordSets",
-#         "route53:ListTagsForResource"
-#       ],
-#       "Resource": [
-#         "*"
-#       ]
-#     }
-#   ]
-#  })
-# }
-
-
 data "aws_iam_policy_document" "external-dns-assume" {
   statement {
     effect = "Allow"
