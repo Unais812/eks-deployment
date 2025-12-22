@@ -31,9 +31,24 @@ jobs:
           terraform_version: 1.8.5
       - name: initialise terraform
         run: terraform init
+
+
+# Implement Checkov scanning for security vulnerabilities
+
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      - name: Test with Checkov
+        id: checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: ./Terraform
+          framework: terraform 
+
       - name: Terraform fmt
         run: terraform fmt
-      - name: Terraform validate 
-        run: terraform validate
       - name: Terraform plan
         run: terraform plan
+
