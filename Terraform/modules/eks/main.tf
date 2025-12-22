@@ -299,4 +299,3 @@ resource "aws_eks_pod_identity_association" "external-dns-pod-association" {
   role_arn        = aws_iam_role.external-dns-role.arn
 }
 
-#
