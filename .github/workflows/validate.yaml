@@ -3,7 +3,7 @@ name: checkout Terraform code
 on: 
   push:
     paths:
-      - ''**.tf'
+      - "**/*.tf"
 
 jobs:
   terraform-check:
