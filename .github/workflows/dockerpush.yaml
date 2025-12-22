@@ -41,7 +41,7 @@ jobs:
             ECR_REPOSITORY: ${{secrets.AWS_ECR_REPO}}
             IMAGE_TAG: latest
           run: |
-            cd app
+            cd eks-deployment
             docker buildx build --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
 
         - name: Run Trivy vulnerability scanner
@@ -56,5 +56,5 @@ jobs:
 
         - name: push image to ECR 
           run: |
-            cd app
+            cd eks-deployment
             docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
