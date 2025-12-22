@@ -42,5 +42,19 @@ jobs:
             IMAGE_TAG: latest
           run: |
             cd app
-            ocker buildx build --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+            docker buildx build --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+
+        - name: Run Trivy vulnerability scanner
+          uses: aquasecurity/trivy-action@0.33.1
+          with:
+            image-ref: 801822495646.dkr.ecr.eu-north-1.amazonaws.com/eks-project:latest
+            format: 'table'
+            exit-code: '1'
+            ignore-unfixed: true
+            vuln-type: 'os,library'
+            severity: 'CRITICAL,HIGH'
+
+        - name: push image to ECR 
+          run: |
+            cd app
             docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
