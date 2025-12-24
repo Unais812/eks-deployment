@@ -1,0 +1,17 @@
+server:
+  extraArgs:
+  - -- insecure # required to disable ssl direction because ingress controller handles this 
+  service:
+    type: ClusterIP
+  ingress: 
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      nginx.org/hsts: "false" # denies access to any pages which arent https encrypted
+      cert-manager.io/cluster-issuer: letsencrypt-route53 # the cluster issuer i created 
+    hosts:
+    - argocd.nginxunais.com
+    tls:
+    - secretName: argocd-ingress-tls
+      hosts:
+      - argocd.nginxunais.com
