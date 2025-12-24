@@ -36,3 +36,7 @@ output "eks-route-table-private-id" {
 output "eip" {
   value = aws_eip.nat.id
 }
+
+output "eks-sg-id" {
+  value = aws_security_group.eks-sg.id
+}

@@ -129,7 +129,31 @@ resource "aws_route_table_association" "private_associations-2" {
   route_table_id = aws_route_table.eks-route-table-private.id
 }
 
-# resource "aws_vpc_endpoint" "eks" {
-#   vpc_id       = aws_vpc.eks-project-vpc.id
-#   service_name = "com.amazonaws.eu-north-1.eks"
-# }
+
+resource "aws_security_group" "eks-sg" {
+  name        = "eks-sg"
+  description = "Allow TLS inbound traffic and all outbound traffic"
+  vpc_id      = aws_vpc.eks-project-vpc.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_https" {
+  security_group_id = aws_security_group.eks-sg.id
+  cidr_ipv4         = var.allow_all_traffic_cidr
+  from_port         = 443
+  ip_protocol       = "tcp"
+  to_port           = 443
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_http" {
+  security_group_id = aws_security_group.eks-sg.id
+  cidr_ipv4         = var.allow_all_traffic_cidr
+  from_port         = 80
+  ip_protocol       = "tcp"
+  to_port           = 80
+}
+
+resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
+  security_group_id = aws_security_group.eks-sg.id
+  cidr_ipv4         = var.allow_all_traffic_cidr
+  ip_protocol       = "-1" # semantically equivalent to all ports
+}

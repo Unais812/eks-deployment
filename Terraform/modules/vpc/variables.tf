@@ -51,3 +51,9 @@ variable "route-table-cidr" {
   type = string
   default = "0.0.0.0/0"
 }
+
+variable "allow_all_traffic_cidr" {
+  description = "cidr to allow internet access"
+  type = string
+  default = "0.0.0.0/0"
+}
