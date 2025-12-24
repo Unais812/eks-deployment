@@ -1,10 +1,12 @@
 resource "aws_eks_cluster" "eks-cluster" {
   name = "eks-cluster"
+
+
   access_config {
     authentication_mode = "API_AND_CONFIG_MAP"
     bootstrap_cluster_creator_admin_permissions = true
 }
-
+  
   role_arn = aws_iam_role.eks-cluster-role.arn
   version  = var.version-k8s
   
@@ -27,8 +29,12 @@ resource "aws_eks_cluster" "eks-cluster" {
   ]
 }
 
+resource "aws_cloudwatch_log_group" "eks-logs" {
+  name = "eks-logs"
+  region = var.region
+  retention_in_days = 5
 
-
+}
 resource "aws_iam_role" "eks-cluster-role" {
   name = "eks-cluster-role"
   assume_role_policy = jsonencode({
@@ -257,6 +263,7 @@ data "aws_iam_policy_document" "external-dns-policy-document" {
     ]
 
     resources = [
+      
       "arn:aws:route53:::hostedzone/*"
     ]
   }
