@@ -49,11 +49,11 @@ spec:
     app: application
   ports:
     - protocol: TCP
-      port: 3000
+      port: 7979
       targetPort: 3000
   type: ClusterIP
 
----
+
 
 
 
