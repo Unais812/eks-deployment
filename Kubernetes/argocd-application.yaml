@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-app
+  namespace: default
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Unais812/eks-deployment/tree/main
+    targetRevision: HEAD
+    path: Kubernetes
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNameSpace=true
