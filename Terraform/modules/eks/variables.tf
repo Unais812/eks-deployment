@@ -110,3 +110,9 @@ variable "pod-iam-arn" {
   type = string
   default = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
 }
+
+variable "region" {
+  description = "region to include for cloudwatch"
+  type = string
+  default = "eu-north-1"
+}
