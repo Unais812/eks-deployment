@@ -3,13 +3,13 @@ resource "aws_eks_cluster" "eks-cluster" {
 
 
   access_config {
-    authentication_mode = "API_AND_CONFIG_MAP"
+    authentication_mode                         = "API_AND_CONFIG_MAP"
     bootstrap_cluster_creator_admin_permissions = true
-}
-  
+  }
+
   role_arn = aws_iam_role.eks-cluster-role.arn
   version  = var.version-k8s
-  
+
   vpc_config {
     subnet_ids = [
       var.private-subnet-1,
@@ -30,8 +30,8 @@ resource "aws_eks_cluster" "eks-cluster" {
 }
 
 resource "aws_cloudwatch_log_group" "eks-logs" {
-  name = "eks-logs"
-  region = var.region
+  name              = "eks-logs"
+  region            = var.region
   retention_in_days = 5
 
 }
@@ -83,20 +83,25 @@ resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSNetworkingPolicy" {
 
 
 resource "aws_eks_addon" "vpc-cni" {
-  cluster_name = aws_eks_cluster.eks-cluster.name
-  addon_name   = "vpc-cni"
+  cluster_name                = aws_eks_cluster.eks-cluster.name
+  addon_name                  = "vpc-cni"
   resolve_conflicts_on_update = "OVERWRITE" # Ensures AWS is source of truth and ignores manual changes
 }
 
 resource "aws_eks_addon" "coredns" {
-  cluster_name = aws_eks_cluster.eks-cluster.name
-  addon_name   = "coredns"
+  cluster_name                = aws_eks_cluster.eks-cluster.name
+  addon_name                  = "coredns"
   resolve_conflicts_on_update = "OVERWRITE"
 }
 
 resource "aws_eks_addon" "kube-proxy" {
-  cluster_name = aws_eks_cluster.eks-cluster.name
-  addon_name   = "kube-proxy"
+  cluster_name                = aws_eks_cluster.eks-cluster.name
+  addon_name                  = "kube-proxy"
+  resolve_conflicts_on_update = "OVERWRITE"
+}
+resource "aws_eks_addon" "eks-pod-identity-agent" {
+  cluster_name                = aws_eks_cluster.eks-cluster.name
+  addon_name                  = "eks-pod-identity-agent"
   resolve_conflicts_on_update = "OVERWRITE"
 }
 
@@ -108,9 +113,9 @@ resource "aws_eks_node_group" "eks-node-group" {
   node_group_name = "eks-node-group"
   node_role_arn   = aws_iam_role.eks-node-role.arn
   subnet_ids      = [var.private-subnet-1, var.private-subnet-2]
-  ami_type = var.ami
-  instance_types = [var.instance-type]
-  
+  ami_type        = var.ami
+  instance_types  = [var.instance-type]
+
   scaling_config {
     desired_size = var.desired-size
     max_size     = var.max-size
@@ -163,6 +168,10 @@ resource "aws_iam_role_policy_attachment" "node-policy-EKS_CNI" {
 
 resource "aws_iam_role_policy_attachment" "node-policy-ec2_registry" {
   policy_arn = var.node-policy3-arn
+  role       = aws_iam_role.eks-node-role.name
+}
+resource "aws_iam_role_policy_attachment" "node-policy-pod-identity" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role       = aws_iam_role.eks-node-role.name
 }
 
@@ -231,7 +240,7 @@ resource "aws_iam_role_policy_attachment" "CertManager-pod" {
 
 resource "aws_eks_pod_identity_association" "example" {
   cluster_name    = aws_eks_cluster.eks-cluster.name
-  namespace       = "cert-manager"   # namespace created by the helm chart
+  namespace       = "cert-manager" # namespace created by the helm chart
   service_account = "external-dns-controller"
   role_arn        = aws_iam_role.CertManager-pod.arn
 }
@@ -250,34 +259,6 @@ data "aws_iam_policy_document" "external-dns-assume" {
       "sts:AssumeRole",
       "sts:TagSession"
     ]
-  }
-}
-
-
-data "aws_iam_policy_document" "external-dns-policy-document" {
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "route53:ChangeResourceRecordSets"
-    ]
-
-    resources = [
-      
-      "arn:aws:route53:::hostedzone/*"
-    ]
-  }
-
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "route53:ListHostedZones",
-      "route53:ListResourceRecordSets",
-      "route53:ListTagsForResource"
-    ]
-
-    resources = ["*"]
   }
 }
 
@@ -306,3 +287,86 @@ resource "aws_eks_pod_identity_association" "external-dns-pod-association" {
   role_arn        = aws_iam_role.external-dns-role.arn
 }
 
+###############
+
+data "aws_iam_policy_document" "external-dns-policy-document" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "route53:ChangeResourceRecordSets"
+    ]
+
+    resources = [
+
+      "arn:aws:route53:::hostedzone/*"
+    ]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "route53:ListHostedZones",
+      "route53:ListResourceRecordSets",
+      "route53:ListTagsForResource"
+    ]
+
+    resources = ["*"]
+  }
+}
+##############
+
+resource "aws_iam_role_policy" "test_policy" {
+  name = "test_policy"
+  role = aws_iam_role.external_dns_role.id
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "route53:ChangeResourceRecordSets",
+        ]
+        Effect   = "Allow"
+        Resource = "arn:aws:route53:::hostedzone/*"
+      },
+      {
+        Action = [
+          "route53:ListHostedZones",
+          "route53:ListResourceRecordSets",
+          "route53:ListTagsForResource",
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role" "external_dns_role" {
+  name = "external_dns_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Sid    = "lol"
+        Principal = {
+          Federated = "arn:aws:iam::801822495646:oidc-provider/oidc.eks.eu-north-1.amazonaws.com/id/724E40B02625D2194508B9963D8630E3",
+        }
+        Condition = {
+          StringEquals = {
+            "oidc.eks.eu-north-1.amazonaws.com/id/724E40B02625D2194508B9963D8630E3:aud" = "sts.amazonaws.com"
+            "oidc.eks.eu-north-1.amazonaws.com/id/724E40B02625D2194508B9963D8630E3:sub" = "system:serviceaccount:external-dns:external-dns"
+            
+          }
+        }
+      },
+    ]
+  })
+}

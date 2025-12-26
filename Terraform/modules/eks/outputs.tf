@@ -1,5 +1,5 @@
 output "eks-cluster-role-arn" {
-    value = aws_iam_role.eks-cluster-role.arn
+  value = aws_iam_role.eks-cluster-role.arn
 }
 
 output "eks-cluster-role-name" {
