@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: eks-ingress
+  annotations:
+   nginx.ingress.kubernetes.io/rewrite-target: /
+   nginx.ingress.kubernetes.io/ssl-redirect: "true" # Forces HTTPS when TLS is configured; prevents plaintext access
+   cert-manager.io/cluster-issuer: letsencrypt-route53 # which cert to use, this ingress wants a cert
+  #  external-dns.alpha.kubernetes.io/hostname: tm.nginxunais.com
+spec:
+  ingressClassName: nginx
+  tls: 
+  - hosts:
+    - tm.nginxunais.com
+    secretName: nginxunais-tls  # K8s tls cert created automatically: contains tls.crt – certificate and tls.key – private key
+  rules:
+  - host: tm.nginxunais.com 
+    http:
+      paths:
+      - path: /
+        pathType: Prefix  # Prefix allows routing of / and any subpaths
+        backend:
+          service:
+            name: eks-service
+            port:
+              number: 7979
+
+
+
+
+
