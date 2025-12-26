@@ -10,13 +10,6 @@ spec:
     privateKeySecretRef:        # Where the private key of cert lives
       name: letsencrypt-route53
     solvers:        # Validate owenership of domain when cert is issued 
-    - dns01:
-        route53:
-          hostedZoneID: Z08062433SPGWTOR9FA3E
-          region: eu-north-1 
-      selector:
-        dnsZones:
-        - tm.nginxunais.com
     - http01:
         ingress:
           class: nginx
