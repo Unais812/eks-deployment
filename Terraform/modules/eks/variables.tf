@@ -1,7 +1,7 @@
 variable "version-k8s" {
   description = "version of k8s"
   type        = string
-  default     = "1.31"
+  default     = "1.34"
 }
 
 
