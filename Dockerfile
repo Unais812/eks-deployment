@@ -12,5 +12,11 @@ WORKDIR /app
 
 COPY --from=builder /app/index.html /app 
 
+RUN addgroup --system group && adduser --system user
+
+RUN chown -R user:group /app
+
+USER user
+
 CMD ["python", "-m", "http.server", "3000"]
 
