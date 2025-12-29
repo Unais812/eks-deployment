@@ -1,0 +1,5 @@
+apiVersion: v2
+name: cert-issuer
+version: 0.1.0
+description: Internal cert-manager manifests
+type: application
