@@ -1,4 +1,4 @@
-FROM python:3.8-slim@sha256:1d52838af602b4b5a831beb13a0e4d073280665ea7be7f69ce2382f29c5a613f AS builder
+FROM python@sha256:e55523f127124e5edc03ba201e3dbbc85172a2ec40d8651ac752364b23dfd733 AS builder
 
 WORKDIR /app
 
@@ -6,7 +6,8 @@ COPY . .
 
 #-------Runtime stage-------#
 
-FROM python:3.8-slim@sha256:1d52838af602b4b5a831beb13a0e4d073280665ea7be7f69ce2382f29c5a613f
+FROM python@sha256:e55523f127124e5edc03ba201e3dbbc85172a2ec40d8651ac752364b23dfd733
+
 
 WORKDIR /app
 
