@@ -105,9 +105,6 @@ resource "aws_eks_addon" "eks-pod-identity-agent" {
   resolve_conflicts_on_update = "OVERWRITE"
 }
 
-
-
-
 resource "aws_eks_node_group" "eks-node-group" {
   cluster_name    = aws_eks_cluster.eks-cluster.name
   node_group_name = "eks-node-group"
@@ -370,3 +367,7 @@ resource "aws_iam_role" "external_dns_role" {
     ]
   })
 }
+
+
+
+

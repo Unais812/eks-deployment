@@ -53,3 +53,4 @@ output "external-dns-role-name" {
 output "external-dns-role-arn" {
   value = aws_iam_role.external-dns-role.arn
 }
+
