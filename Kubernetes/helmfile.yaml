@@ -1,3 +1,7 @@
+helmDefaults:
+  skipRefresh: true
+
+
 repositories:
   - name: ingress-nginx
     url: https://kubernetes.github.io/ingress-nginx
@@ -17,13 +21,13 @@ repositories:
 releases:
   # 1. ingress-nginx
   - name: ingress-nginx
-    namespace: ingress-nginx
+    namespace: nginx
     createNamespace: true
     chart: ingress-nginx/ingress-nginx
     version: 4.10.1
     wait: true
 
-  # 2. cert-manager (CRDs first)
+  # 2. cert-manager (CRDs + controller)
   - name: cert-manager
     namespace: cert-manager
     createNamespace: true
@@ -33,7 +37,7 @@ releases:
       - installCRDs: true
     wait: true
     needs:
-      - ingress-nginx/ingress-nginx
+      - nginx/ingress-nginx
 
   # 3. external-dns
   - name: external-dns
@@ -42,45 +46,77 @@ releases:
     chart: external-dns/external-dns
     version: 1.14.5
     values:
-      - externaldns-values.yaml
+      - helm-values/externaldns-values.yaml
     wait: true
     needs:
-      - ingress-nginx/ingress-nginx
+      - nginx/ingress-nginx
 
   # 4. Argo CD
   - name: argocd
-    namespace: argocd
+    namespace: argo
     createNamespace: true
     chart: argo/argo-cd
     version: 7.7.3
     values:
-      - argocd-values.yaml
+      - helm-values/argocd-values.yaml
     wait: true
+    needs:
+      - nginx/ingress-nginx
 
   # 5. Prometheus
   - name: prometheus
     namespace: monitoring
     createNamespace: true
-    chart: prometheus-community/prometheus
-    version: 25.27.0
+    chart: prometheus-community/kube-prometheus-stack
+    version: 80.2.1
     wait: true
+    needs:
+      - nginx/ingress-nginx
 
   # 6. Grafana
   - name: grafana
     namespace: monitoring
-    chart: prometheus-community/grafana
+    chart: grafana/grafana
     version: 8.6.0
     wait: true
     needs:
       - monitoring/prometheus
+      - nginx/ingress-nginx
 
-  # 7. Raw Kubernetes manifests (applied last)
-  - name: k8s-manifests
+
+  # 7. Raw Kubernetes manifests (grouped by folders)
+  - name: app-manifests
     namespace: default
-    chart: ./manifests
+    chart: ./charts/app
     wait: true
     needs:
-      - ingress-nginx/ingress-nginx
+      - nginx/ingress-nginx
       - cert-manager/cert-manager
-      - external-dns/external-dns
+
+  - name: argocd-manifests
+    namespace: argo
+    chart: ./charts/argocd
+    wait: true
+    needs:
+      - argo/argocd
+
+  - name: cert-manager-manifests
+    namespace: cert-manager
+    chart: ./charts/cert-issuer
+    wait: true
+    needs:
+      - cert-manager/cert-manager
+
+  - name: grafana-manifest
+    namespace: monitoring
+    chart: ./charts/grafana
+    wait: true
+    needs:
       - monitoring/grafana
+  
+  - name: prometheus-manifest
+    namespace: monitoring
+    chart: ./charts/prometheus
+    wait: true
+    needs:
+      - monitoring/prometheus
