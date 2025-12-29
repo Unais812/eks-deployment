@@ -42,9 +42,14 @@ Deployment of the 2048 game using scalable production ready infrastructure on Am
 
 ## Grafana & Prometheus 
 
-![alt text](<Screenshot 2025-12-29 at 00.09.49.png>)
-##
-![alt text](<Screenshot 2025-12-29 at 00.23.47.png>)
+
+
+
+
+
+
+
+
 
 ## ArgoCD
 
