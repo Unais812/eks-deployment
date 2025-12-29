@@ -57,8 +57,6 @@ releases:
     createNamespace: true
     chart: argo/argo-cd
     version: 7.7.3
-    values:
-      - helm-values/argocd-values.yaml
     wait: true
     needs:
       - nginx/ingress-nginx
