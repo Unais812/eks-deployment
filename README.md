@@ -24,7 +24,7 @@ Deployment of the 2048 game using scalable production ready infrastructure on Am
 
 
 ## Docker 
-- Implemented multistage builds reducing image size by x%
+- Implemented multistage builds reducing image size by 88%
 - Non root user to tighten security and follow best practice 
 
 
