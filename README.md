@@ -67,7 +67,7 @@ The process was far from easy but we got there in the end \
 This project taught me a lot about K8s and also a lot about myself \
 I learnt that i could seriously stick to something and put all my time and effort into learning  \
 Whilst doing this project i caught a nasty fever but i continued building and deploying because i knew my work wasnt finished \
-Project 1, Fever 0 
+Project 1, Fever 0 \
 Thank you for taking the time to look at my project, the 2nd of many
 
 
