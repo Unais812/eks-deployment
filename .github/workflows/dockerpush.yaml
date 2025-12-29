@@ -55,4 +55,4 @@ jobs:
 
         - name: push image to ECR 
           run: |
-            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+            docker push 801822495646.dkr.ecr.eu-north-1.amazonaws.com/eks-project:latest
