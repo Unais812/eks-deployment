@@ -7,7 +7,7 @@ metadata:
    prometheus.io/port: "8080"
    nginx.ingress.kubernetes.io/rewrite-target: /
    nginx.ingress.kubernetes.io/ssl-redirect: "true" # Forces HTTPS when TLS is configured; prevents plaintext access
-   cert-manager.io/cluster-issuer: prometheus-secret # which cert to use, this ingress wants a cert
+   cert-manager.io/cluster-issuer: letsencrypt-route53 # which cert to use, this ingress wants a cert
 spec:
   ingressClassName: nginx
   tls: 
