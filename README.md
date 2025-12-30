@@ -15,7 +15,6 @@ Deployment of the 2048 game using scalable production ready infrastructure on Am
 - Cert-manager: DNS validation and cert management  
 - HELM: Orchestrate K8S deployments  
 - Prometheus and Grafana: Provides cluster metrics and utilises neat dashboards for visualisation 
-- Amazon EBS CSI driver introducing persistent storage for prometheus 
 - OIDC: Web tokens rather than providing access keys mitigating security risks implementing security best practices 
 
 ## Architecture diagram
